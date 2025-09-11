@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+for name in curl tar jq; do
+	echo "$name"
+done
