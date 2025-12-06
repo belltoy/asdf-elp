@@ -2,13 +2,10 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for elp.
 GH_REPO="https://github.com/WhatsApp/erlang-language-platform"
 GH_REPO_API="https://api.github.com/repos/WhatsApp/erlang-language-platform/releases"
 TOOL_NAME="elp"
 TOOL_TEST="elp version"
-
-otp_versions="26 27 28"
 
 fail() {
 	echo -e "asdf-$TOOL_NAME: $*"
@@ -17,7 +14,6 @@ fail() {
 
 curl_opts=(-fsSL)
 
-# NOTE: You might want to remove this if elp is not hosted on GitHub releases.
 if [ -n "${GITHUB_API_TOKEN:-}" ]; then
 	curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
 fi
@@ -71,7 +67,7 @@ download_release() {
 	arch="$(detect_architecture)"
 	platform="$(detect_platform)"
 
-    # Adapt the release URL convention for elp
+	# Adapt the release URL convention for elp
 	url="$GH_REPO/releases/download/${date_ver}/elp-${os}-${arch}-${platform}-${otp_ver}.tar.gz"
 
 	echo "* Downloading $TOOL_NAME release $version..."
@@ -107,35 +103,35 @@ detect_os() {
 	local os=""
 
 	case "$OSTYPE" in
-		darwin*) os="macos" ;;
-		linux*) os="linux" ;;
-		msys*) os="windows" ;;
-		*) fail "Unsupported OS" ;;
+	darwin*) os="macos" ;;
+	linux*) os="linux" ;;
+	msys*) os="windows" ;;
+	*) fail "Unsupported OS" ;;
 	esac
 
 	echo "$os"
 }
 
 detect_platform() {
-    local platform=""
+	local platform=""
 
-    case "$OSTYPE" in
-        darwin*) platform="apple-darwin" ;;
-        linux*) platform="unknown-linux-gnu" ;;
-        msys*) platform="pc-windows-msvc" ;;
-        *) fail "Unsupported platform" ;;
-    esac
+	case "$OSTYPE" in
+	darwin*) platform="apple-darwin" ;;
+	linux*) platform="unknown-linux-gnu" ;;
+	msys*) platform="pc-windows-msvc" ;;
+	*) fail "Unsupported platform" ;;
+	esac
 
-    echo "$platform"
+	echo "$platform"
 }
 
 detect_architecture() {
 	local architecture=""
 
 	case "$(uname -m)" in
-		x86_64) architecture="x86_64" ;;
-		aarch64 | arm64) architecture="aarch64" ;;
-		*) fail "Unsupported architecture" ;;
+	x86_64) architecture="x86_64" ;;
+	aarch64 | arm64) architecture="aarch64" ;;
+	*) fail "Unsupported architecture" ;;
 	esac
 
 	echo "$architecture"
