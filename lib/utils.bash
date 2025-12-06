@@ -61,6 +61,8 @@ download_release() {
 	version="$1"
 	filename="$2"
 
+	otp_ver=""
+	date_ver=""
 	os="$(detect_os)"
 	arch="$(detect_architecture)"
 	platform="$(detect_platform)"
