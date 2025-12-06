@@ -2,9 +2,13 @@
 
 # asdf-elp [![Build](https://github.com/belltoy/asdf-elp/actions/workflows/build.yml/badge.svg)](https://github.com/belltoy/asdf-elp/actions/workflows/build.yml) [![Lint](https://github.com/belltoy/asdf-elp/actions/workflows/lint.yml/badge.svg)](https://github.com/belltoy/asdf-elp/actions/workflows/lint.yml)
 
+</div>
+
 [elp](https://whatsapp.github.io/erlang-language-platform) plugin for the [asdf version manager](https://asdf-vm.com).
 
-</div>
+> [!Tip]
+> Since `elp` use date as release version for now, this plugin provides aliases for each supported
+> OTP version for conveniently installing the latest `elp` for that OTP version.
 
 # Contents
 
@@ -18,7 +22,6 @@
 **TODO: adapt this section**
 
 - `bash`, `curl`, `tar`, `jq`, and [POSIX utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html).
-- `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
 
 # Install
 
@@ -34,7 +37,7 @@ elp:
 
 ```shell
 # Show all installable versions
-asdf list-all elp
+asdf list all elp
 
 # Install specific version
 asdf install elp latest
