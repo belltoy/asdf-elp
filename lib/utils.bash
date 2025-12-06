@@ -36,6 +36,7 @@ list_github_releases() {
 				)
 		}) | map(.date as $date | .assets | map({
 			name,
+			otp,
 			date: $date,
 			version: "\(.otp)-\($date)"
 		}))
@@ -44,33 +45,54 @@ list_github_releases() {
 		| map({
 			version: .[0].version,
 			date: .[0].date,
+			otp: .[0].otp,
 			assets: .
 		})
 		| sort_by(.date)
-		| map(.version)
-		| join(" ")'
+		'
 }
 
 list_all_versions() {
-	list_github_releases
+	list_github_releases | jq -r '. | map(.version) | join(" ")'
 }
 
 download_release() {
-	local version filename url
+	local version filename url os arch platform otp_ver date_ver
 	version="$1"
 	filename="$2"
-
-	otp_ver="$(echo "$version" | cut -d'-' -f1-2)"
-	date_ver="$(echo "$version" | cut -d'-' -f3-)"
 
 	os="$(detect_os)"
 	arch="$(detect_architecture)"
 	platform="$(detect_platform)"
 
+	if echo "$version" | grep '^otp-[^-]\+-\d\d\d\d-\d\d-\d\d'; then
+		echo "* Installing $TOOL_NAME version $version..."
+		otp_ver="$(echo "$version" | cut -d'-' -f1-2)"
+		date_ver="$(echo "$version" | cut -d'-' -f3-)"
+	elif echo "$version" | grep '^otp-[^.-][^.-]\(\.[^.-]\+\)\?$'; then
+		echo "* Detecting latest $TOOL_NAME release for OTP version $version..."
+		local selected=""
+		selected=$(list_github_releases | jq -r --arg otp "$version" --arg os "$os" --arg arch "$arch" --arg platform "$platform" '
+			.
+			| map(select(.otp | startswith($otp)))
+			| .[-1].assets[]
+			| select(.name | startswith("elp-\($os)-\($arch)-\($platform)"))
+		')
+		date_ver=$(echo "$selected" | jq -r '.date')
+		otp_ver=$(echo "$selected" | jq -r '.otp')
+	fi
+
+	if [ -z "$date_ver" ] || [ -z "$otp_ver" ]; then
+		fail "Could not find release for version: $version"
+	fi
+
 	# Adapt the release URL convention for elp
-	url="$GH_REPO/releases/download/${date_ver}/elp-${os}-${arch}-${platform}-${otp_ver}.tar.gz"
+	local archive_name
+	archive_name="elp-${os}-${arch}-${platform}-${otp_ver}.tar.gz"
+	url="$GH_REPO/releases/download/${date_ver}/${archive_name}"
 
 	echo "* Downloading $TOOL_NAME release $version..."
+	echo "* Matching OTP version: $otp_ver, archive: $archive_name"
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
