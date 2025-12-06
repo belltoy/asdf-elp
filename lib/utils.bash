@@ -67,11 +67,11 @@ download_release() {
 	arch="$(detect_architecture)"
 	platform="$(detect_platform)"
 
-	if echo "$version" | grep '^otp-[^-]\+-\d\d\d\d-\d\d-\d\d'; then
+	if echo "$version" | grep -E '^otp-[^-]+-[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
 		echo "* Installing $TOOL_NAME version $version..."
 		otp_ver="$(echo "$version" | cut -d'-' -f1-2)"
 		date_ver="$(echo "$version" | cut -d'-' -f3-)"
-	elif echo "$version" | grep '^otp-[^.-][^.-]\(\.[^.-]\+\)\?$'; then
+	elif echo "$version" | grep -E '^otp-[^.-][^.-](\.[^.-]+)?$'; then
 		echo "* Detecting latest $TOOL_NAME release for OTP version $version..."
 		local selected=""
 		selected=$(list_github_releases | jq -r --arg otp "$version" --arg os "$os" --arg arch "$arch" --arg platform "$platform" '
